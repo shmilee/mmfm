@@ -1,0 +1,128 @@
+#!/usr/bin/env python2
+# -*- coding=utf-8 -*-
+import pygtk
+pygtk.require('2.0')
+import gtk,os
+import webkit
+import gobject,webbrowser
+flag=0
+url = "http://player.kuwo.cn/webmusic/artdt/artdt.jsp?f=wlh&from=360"
+ICON = os.path.join(os.path.dirname(__file__), 'pics/kuwo.png')# change it to ur own favoured ico
+icon=os.path.join(os.path.dirname(__file__), 'pics/note_2.png')
+VERSION = "Gnome3"
+NAME = "酷我音乐"
+
+class Browser:
+
+    def __init__(self):
+        gobject.threads_init()
+        self.window = gtk.Window(gtk.WINDOW_TOPLEVEL)
+        	
+        self.window.set_resizable(True)
+        self.window.set_default_size( 540,290)
+        flag=0
+        self.window.connect("delete_event", self.minimize)
+        self.window.connect("key-press-event",self.onpress)
+        self.window.connect('check-resize', self.check_resize)
+        self.web_view = webkit.WebView()
+        self.web_view.open(url)
+        
+
+	self.toolbar = gtk.Toolbar()        
+        self.toolbar.set_style(gtk.TOOLBAR_TEXT)
+        
+       
+       
+        iconw = gtk.Image() 
+        close_button = self.toolbar.append_item( "梁静茹",  "",    "Private",  iconw,   self.ljr)
+        iconw2 = gtk.Image()   #meaningless, just to avoid warnings
+        zjl_button = self.toolbar.append_item( "周杰伦",  "",    "Private",  iconw2,   self.zjl)
+        iconw3 = gtk.Image() 
+        wlh_button = self.toolbar.append_item( "王力宏",  "",    "Private",  iconw3,   self.wlh)
+        
+        self.entry = gtk.Entry()
+        self.entry.select_region(0, len(self.entry.get_text()))
+        self.entry.connect("activate", self.on_active)
+        self.toolbar.append_widget(self.entry,  "请输入歌手名称缩写", "Private")
+        #for instance, use wf for Wang Fei
+        #some names such as SunYanzi(syz) may not work
+
+        self.entry.show()   
+        scroll_window = gtk.ScrolledWindow(None, None)
+        scroll_window.add(self.web_view)
+        vbox = gtk.VBox(False, 0)
+        vbox.pack_start(self.toolbar, False, True, 0)
+        vbox.add(scroll_window)
+
+        self.window.add(vbox)
+        self.window.show_all()
+        self.toolbar.hide()
+        
+    def check_resize(self, window):
+		self.window.set_size_request(540,290)
+        
+    def onpress(self,window,event):
+        global flag
+        if event.keyval==65507:
+        	if flag==1:
+        		self.toolbar.hide()
+        		flag=0
+        	elif flag==0:
+        		self.toolbar.show()
+        		flag=1
+        
+    def on_active(self, widge, data=None):
+    	tmp = self.entry.get_text()
+    	url = "http://player.kuwo.cn/webmusic/artdt/artdt.jsp?f="+tmp+"&from=360"
+     	self.web_view.open(url)
+        
+    def minimize(self, widget, event, data=None):
+		self.window.hide()
+		return True
+
+    def ljr(self, widget, data=None):        
+        url="http://player.kuwo.cn/webmusic/artdt/artdt.jsp?f=ljr&from=360"
+        self.web_view.open(url)        
+    def zjl(self, widget, data=None):
+        url="http://player.kuwo.cn/webmusic/artdt/artdt.jsp?f=zjl&from=360"
+        self.web_view.open(url)
+    def wlh(self, widget, data=None):        
+        url="http://player.kuwo.cn/webmusic/artdt/artdt.jsp?f=wlh&from=360"
+        self.web_view.open(url)        
+
+
+
+    def main(self):
+        gtk.main()
+        
+class Tray():
+	
+	def __init__(self, window):
+		self.window = window.window	
+		self.window.set_title(NAME)		
+		self.tray = gtk.StatusIcon()
+		self.tray.set_from_file(ICON)
+		self.window.set_icon_from_file(icon)
+		self.tray.set_tooltip(NAME + '\n ' + VERSION)
+		self.tray.connect('activate', self.clickTray)
+		self.tray.connect('popup-menu', self.quit)
+		
+	def clickTray(self, widget):
+		if self.window.get_property('is-active'):
+			self.window.hide()
+		else:
+			self.window.present()
+
+	def quit(self,widget,event, data=None):
+		gtk.main_quit()
+	
+class music():
+	
+	def __init__(self):
+		self.window = Browser()
+		self.tray = Tray(self.window)
+
+
+if __name__ == '__main__':
+	music()
+	gtk.main()

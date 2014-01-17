@@ -1,0 +1,5 @@
+For unity users, please add the corresponding apps into your unity white list.
+	alternatively, you can use the wlist file provided, for example,
+	./wlist Kuwo
+	this will add Kuwo into your whitelist
+great thanks to the music providers!

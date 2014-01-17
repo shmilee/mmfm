@@ -1,0 +1,11 @@
+[Desktop Entry]
+Encoding=UTF-8
+Name=MMFM
+Name[zh_CN]=MM电台
+Comment=Internet-Radio
+Comment[zh_CN]=网络电台
+Icon=/usr/share/mmfm/pics/note_1.png
+Exec=mmfm
+Terminal=false
+Type=AudioVideo;Audio;
+Categories=AudioVideo;Audio;

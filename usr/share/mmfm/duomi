@@ -1,0 +1,70 @@
+#!/usr/bin/env python2
+# -*- coding=utf-8 -*-
+# if you have any suggestions, you can email me at oooo4dzd@gmail.com
+
+import os, gtk, pynotify,webkit,gobject,sys,webbrowser
+
+URL = "http://app.duomiyy.com/songplayer/v2/app/l100018/DuomiWebPlayer.swf"
+ICON = os.path.join(os.path.dirname(__file__), 'pics/duomi.png')# change it to ur own favoured ico
+icon=os.path.join(os.path.dirname(__file__), 'pics/note_2.png')
+VERSION = "Gnome3"
+NAME = "多米音乐"
+
+class WebBrowser(gtk.Window):	
+	
+	def __init__(self):	
+		gtk.Window.__init__(self)
+		self.set_default_size( 500,300)		
+		self.page = webkit.WebView()
+		self.add(self.page)
+		self.show_all()
+		self.page.open(URL)
+		self.connect("delete_event", self.minimize)
+		self.connect('check-resize', self.check_resize)
+		
+	def minimize(self, widget, event, data=None):
+		self.hide()
+		return True
+	def check_resize(self, window):
+		self.set_size_request(500,300)
+	
+	
+
+class Tray():
+	
+	def __init__(self, window):
+		self.window = window	
+		self.window.set_title(NAME)		
+		self.tray = gtk.StatusIcon()
+		self.tray.set_from_file(ICON)
+		self.window.set_icon_from_file(icon)
+		self.tray.set_tooltip(NAME + '\n ' + VERSION)
+		self.tray.connect('activate', self.clickTray)
+		self.tray.connect('popup-menu', self.quit)
+		
+		
+
+	def clickTray(self, widget):
+		if self.window.get_property('is-active'):
+			self.window.hide()
+		else:
+			self.window.present()
+
+	
+	def quit(self,widget,event, data=None):
+		gtk.main_quit()
+		
+	
+		
+	
+
+
+class music():
+	
+	def __init__(self):
+		self.window = WebBrowser()
+		self.tray = Tray(self.window)
+
+if __name__ == '__main__':
+	music()
+	gtk.main()
